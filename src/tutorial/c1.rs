@@ -1,13 +1,12 @@
-use candle_core::{DType, Device, Result,Tensor,D};
+use candle_core::{DType, Device, Result, Tensor, D};
 use candle_nn::{loss, ops, Conv2d, Linear, Module, ModuleT, Optimizer, VarBuilder, VarMap};
-use tokio::net::TcpListener;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};// use candle_datasets::vision::Dataset;
 use polars::prelude::*;
 use std::fs::File;
+use tokio::io::{AsyncReadExt, AsyncWriteExt}; // use candle_datasets::vision::Dataset;
+use tokio::net::TcpListener;
 
-
-const IMAGE_WIDTH:usize=784;
-const LABELS:usize = 10;
+const IMAGE_WIDTH: usize = 784;
+const LABELS: usize = 10;
 const VOTE_DIM: usize = 784;
 const RESULTS: usize = 1;
 const EPOCHS: usize = 10; //에포크설정
@@ -73,9 +72,10 @@ fn train(m: Dataset, dev: &Device) -> anyhow::Result<MultiLevelPerceptron> {
             .to_scalar::<f32>()?;
         let test_accuracy = sum_ok / test_results.dims1()? as f32;
         final_accuracy = 100. * test_accuracy;
-        println!("Epoch: {epoch:3} Train loss: {:8.5} Test accuracy: {:5.2}%",
-                 loss.to_scalar::<f32>()?,
-                 final_accuracy
+        println!(
+            "Epoch: {epoch:3} Train loss: {:8.5} Test accuracy: {:5.2}%",
+            loss.to_scalar::<f32>()?,
+            final_accuracy
         );
         if final_accuracy == 100.0 {
             break;
@@ -90,35 +90,37 @@ fn train(m: Dataset, dev: &Device) -> anyhow::Result<MultiLevelPerceptron> {
 
 //관용적 오류
 #[tokio::main]
-pub  async fn c1() -> anyhow::Result<()> {
-    
+pub async fn c1() -> anyhow::Result<()> {
     let dev = Device::cuda_if_available(0)?;
     let train_df = CsvReader::from_path("./dataset/digit-recognizer/train.csv")
-    .unwrap()
-    .finish()
-    .unwrap();
-let labels: Vec<i64> = train_df
-.column("label")
-.unwrap()
-.i64()
-.unwrap()
-.into_no_null_iter()
-.collect();
+        .unwrap()
+        .finish()
+        .unwrap();
+    let labels: Vec<i64> = train_df
+        .column("label")
+        .unwrap()
+        .i64()
+        .unwrap()
+        .into_no_null_iter()
+        .collect();
 
     let pixel = train_df
-    .drop("label")
-    .unwrap()
-    .to_ndarray::<Float32Type>(IndexOrder::Fortran)
-    .unwrap();
+        .drop("label")
+        .unwrap()
+        .to_ndarray::<Float32Type>(IndexOrder::Fortran)
+        .unwrap();
 
-    let mut year_built_vec:  Vec<f32> =  pixel.iter().cloned().collect();
+    let mut year_built_vec: Vec<f32> = pixel.iter().cloned().collect();
 
- 
     //2행2열?16 2행2열 8,
-    
 
-    let train_votes_tensor = Tensor::from_vec(year_built_vec.clone(), (year_built_vec.len() / VOTE_DIM, VOTE_DIM), &dev)?.to_dtype(DType::F32)?;
-    println!("{}",train_votes_tensor);
+    let train_votes_tensor = Tensor::from_vec(
+        year_built_vec.clone(),
+        (year_built_vec.len() / VOTE_DIM, VOTE_DIM),
+        &dev,
+    )?
+    .to_dtype(DType::F32)?;
+    println!("{}", train_votes_tensor);
 
     // let train_results_vec: Vec<u32> = vec![
     //     1,
