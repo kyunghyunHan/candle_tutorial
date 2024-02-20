@@ -10,11 +10,11 @@ const LABELS: usize = 10;
 const VOTE_DIM: usize = 784;
 const RESULTS: usize = 1;
 const EPOCHS: usize = 10; //에포크설정
-const LAYER1_OUT_SIZE: usize = 4;
-const LAYER2_OUT_SIZE: usize = 2;
+const LAYER1_OUT_SIZE: usize = 784;
+const LAYER2_OUT_SIZE: usize = 10;
 const LEARNING_RATE: f64 = 0.05;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub struct Dataset {
     pub train_votes: Tensor,
     pub train_results: Tensor,
@@ -96,10 +96,29 @@ pub async fn c1() -> anyhow::Result<()> {
         .unwrap()
         .finish()
         .unwrap();
-    let labels: Vec<i64> = train_df
+    let test_df = CsvReader::from_path("./dataset/digit-recognizer/test.csv")
+        .unwrap()
+        .finish()
+        .unwrap();
+    let submission_df = CsvReader::from_path("./dataset/digit-recognizer/sample_submission.csv")
+        .unwrap()
+        .finish()
+        .unwrap();
+    let labels: Vec<u32> = train_df
         .column("label")
         .unwrap()
-        .i64()
+        .cast(&DataType::UInt32)
+        .unwrap()
+        .u32()
+        .unwrap()
+        .into_no_null_iter()
+        .collect();
+    let test_labels: Vec<u32> = submission_df
+        .column("Label")
+        .unwrap()
+        .cast(&DataType::UInt32)
+        .unwrap()
+        .u32()
         .unwrap()
         .into_no_null_iter()
         .collect();
@@ -110,81 +129,71 @@ pub async fn c1() -> anyhow::Result<()> {
         .to_ndarray::<Float32Type>(IndexOrder::Fortran)
         .unwrap();
 
-    let mut year_built_vec: Vec<f32> = pixel.iter().cloned().collect();
 
-    //2행2열?16 2행2열 8,
+
+    let image_vec: Vec<f32> = pixel.iter().cloned().collect();
 
     let train_votes_tensor = Tensor::from_vec(
-        year_built_vec.clone(),
-        (year_built_vec.len() / VOTE_DIM, VOTE_DIM),
+        image_vec.clone(),
+        (image_vec.len() / VOTE_DIM, VOTE_DIM),
         &dev,
     )?
     .to_dtype(DType::F32)?;
-    println!("{}", train_votes_tensor);
 
-    // let train_results_vec: Vec<u32> = vec![
-    //     1,
-    //     0,
-    //     0,
-    //     1,
-    //     1,
-    //     0,
-    //     0,
-    //     1,
-    // ];
-    // let train_results_tensor = Tensor::from_vec(train_results_vec, train_votes_vec.len() / VOTE_DIM, &dev)?;
+    let train_results_tensor = Tensor::from_vec(labels.clone(), labels.len() , &dev)?;
+    
+    let test_pixel = test_df
+        .to_ndarray::<Float32Type>(IndexOrder::Fortran)
+        .unwrap();
+    let test_image_vec: Vec<f32> = test_pixel.iter().cloned().collect();
 
-    // let test_votes_vec: Vec<u32> = vec![
-    //     13, 9,
-    //     8, 14,
-    //     3, 10,
-    // ];
-    // let test_votes_tensor = Tensor::from_vec(test_votes_vec.clone(), (test_votes_vec.len() / VOTE_DIM, VOTE_DIM), &dev)?.to_dtype(DType::F32)?;
+    let test_votes_tensor = Tensor::from_vec(
+        test_image_vec.clone(),
+        (test_image_vec.len() / VOTE_DIM, VOTE_DIM),
+        &dev,
+    )?
+    .to_dtype(DType::F32)?;
 
-    // let test_results_vec: Vec<u32> = vec![
-    //     1,
-    //     0,
-    //     0,
-    // ];
-    // let test_results_tensor = Tensor::from_vec(test_results_vec.clone(), test_results_vec.len(), &dev)?;
+    let test_results_tensor = Tensor::from_vec(test_labels.clone(), test_labels.len(), &dev)?;
+     
+    let m = Dataset {
+        train_votes: train_votes_tensor,
+        train_results: train_results_tensor,
+        test_votes: test_votes_tensor,
+        test_results: test_results_tensor,
+    };
+    println!("{:?}",m);
+   
+    let trained_model: MultiLevelPerceptron;
+    loop {
+        println!("Trying to train neural network.");
+        match train(m.clone(), &dev) {
+            Ok(model) => {
+                trained_model = model;
+                break;
+            },
+            Err(e) => {
+                println!("Error: {}", e);
+                continue;
+            }
+        }
 
-    // let m = Dataset {
-    //     train_votes: train_votes_tensor,
-    //     train_results: train_results_tensor,
-    //     test_votes: test_votes_tensor,
-    //     test_results: test_results_tensor,
-    // };
+    }
 
-    // let trained_model: MultiLevelPerceptron;
-    // loop {
-    //     println!("Trying to train neural network.");
-    //     match train(m.clone(), &dev) {
-    //         Ok(model) => {
-    //             trained_model = model;
-    //             break;
-    //         },
-    //         Err(e) => {
-    //             println!("Error: {}", e);
-    //             continue;
-    //         }
-    //     }
+    let real_world_votes: Vec<u32> = vec![
+        13, 22,
+    ];
 
-    // }
+    let tensor_test_votes = Tensor::from_vec(real_world_votes.clone(), (1, VOTE_DIM), &dev)?.to_dtype(DType::F32)?;
 
-    // let real_world_votes: Vec<u32> = vec![
-    //     13, 22,
-    // ];
+    let final_result = trained_model.forward(&tensor_test_votes)?;
 
-    // let tensor_test_votes = Tensor::from_vec(real_world_votes.clone(), (1, VOTE_DIM), &dev)?.to_dtype(DType::F32)?;
-
-    // let final_result = trained_model.forward(&tensor_test_votes)?;
-
-    // let result = final_result
-    //     .argmax(D::Minus1)?
-    //     .to_dtype(DType::F32)?
-    //     .get(0).map(|x| x.to_scalar::<f32>())??;
-    // println!("real_life_votes: {:?}", real_world_votes);
-    // println!("neural_network_prediction_result: {:?}", result);
+    let result = final_result
+        .argmax(D::Minus1)?
+        .to_dtype(DType::F32)?
+        .get(0).map(|x| x.to_scalar::<f32>())??;
+    println!("real_life_votes: {:?}", real_world_votes);
+    println!("neural_network_prediction_result: {:?}", result);
 
     Ok(())
 }
