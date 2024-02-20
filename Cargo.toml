@@ -7,3 +7,10 @@ edition = "2021"
 
 [dependencies]
 candle-core = "0.3.3"
+candle-datasets ="0.3.3"
+candle-nn = "0.3.3"
+polars = { version = "0.36.2", features = ["ndarray","to_dummies","lazy","describe","strings","list_count","describe","cov"] }
+
+tokio = { version = "1.36.0", features = ["full"] }
+
+anyhow = "1.0.80"

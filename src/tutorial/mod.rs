@@ -1,5 +1,6 @@
- pub  mod c1;
+pub mod c0;
+pub mod c1;
 
- pub fn main(){
-    c1::main();
- }
+pub fn main() {
+    c1::c1();
+}
