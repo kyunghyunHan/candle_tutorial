@@ -90,7 +90,7 @@ fn train(m: Dataset, dev: &Device) -> anyhow::Result<MultiLevelPerceptron> {
 
 //관용적 오류
 #[tokio::main]
-pub async fn c1() -> anyhow::Result<()> {
+pub async fn model() -> anyhow::Result<()> {
     let dev = Device::cuda_if_available(0)?;
     let train_df = CsvReader::from_path("./dataset/digit-recognizer/train.csv")
         .unwrap()
