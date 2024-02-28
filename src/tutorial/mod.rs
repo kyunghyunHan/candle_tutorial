@@ -1,6 +1,7 @@
 pub mod c0;
 pub mod c1;
+pub mod c2;
 
 pub fn main() {
-    c1::c1().unwrap()
+    c2::c2().unwrap()
 }
