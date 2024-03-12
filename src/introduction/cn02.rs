@@ -33,6 +33,7 @@ pub async fn main() -> anyhow::Result<()> {
         &device,
     )?;
     let y_train = Tensor::new(&[[152.], [185.], [180.], [196.], [142.]], &device)?;
+    // println!("{:?}",Tensor:: from_slice(&y_train.to_vec1::<f32>(),(2,3),&device));
     let varmap = VarMap::new();
 
     let vs = VarBuilder::from_varmap(&varmap, DType::F64, &device);
