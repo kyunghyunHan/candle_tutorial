@@ -3,6 +3,6 @@ mod introduction;
 //test
 
 fn main() {
-    introduction::cn01::main().unwrap();
+    introduction::cn02::main().unwrap();
   
 }

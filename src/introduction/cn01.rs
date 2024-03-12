@@ -12,7 +12,7 @@ impl MultiLevelPerceptron {
         let ln1 = candle_nn::linear(1, 1, vs.pp("ln1"))?;
         Ok(Self { ln1})
     }
-
+ 
     fn forward(&self, xs: &Tensor) -> candle_core::Result<Tensor> {
       self.ln1.forward(xs)
     }
