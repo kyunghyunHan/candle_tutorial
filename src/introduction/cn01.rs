@@ -1,3 +1,4 @@
+//단순선형회귀
 use candle_core::{DType, Device, Tensor,D};
 use candle_nn::{loss, Linear, Module, Optimizer, VarBuilder, VarMap, SGD,ops};
 const LEARNING_RATE: f64 = 0.01;
