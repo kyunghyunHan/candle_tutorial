@@ -1,6 +1,7 @@
 //다중
 use candle_core::{DType, Device, Tensor, D};
 use candle_nn::{loss, ops, Linear, Module, Optimizer, VarBuilder, VarMap, SGD};
+use candle_datasets::{Batcher};
 const LEARNING_RATE: f64 = 1e-5;
 const EPOCHS: usize = 2000;
 
@@ -44,7 +45,7 @@ pub async fn main() -> anyhow::Result<()> {
         sgd.backward_step(&loss)?;
 
 
-        if epoch % 100 == 0 {
+    if epoch % 100 == 0 {
             println!(
                 "Epoch {}/{} Cost : {:.6}",
                 EPOCHS,
