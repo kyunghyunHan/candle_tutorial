@@ -379,6 +379,7 @@ dependencies = [
  "candle-core",
  "candle-datasets",
  "candle-nn",
+ "ndarray",
  "polars",
  "tokio",
 ]

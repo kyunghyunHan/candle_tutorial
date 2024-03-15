@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use candle_core::{Tensor,Device};
 #[tokio::main]
 
 pub async fn main() -> anyhow::Result<()> {
@@ -29,9 +30,26 @@ pub async fn main() -> anyhow::Result<()> {
     println!("{:?}", index_to_char);
 
     let x_data: Vec<usize> = input_str.chars().map(|c| char_to_index[&c]).collect();
-    let y_data: Vec<usize> = label_str.chars().map(|c| char_to_index[&c]).collect();
+    let y_data: Vec<u32> = label_str.chars().map(|c| char_to_index[&c] as u32).collect();
 
     println!("{:?}", x_data);
     println!("{:?}", y_data);
+
+    let mut x_one_hot = Vec::new();
+    for &x in &x_data {
+        x_one_hot.push(one_hot_encode(x, vocab_size));
+    }
+    println!("{:?}", x_one_hot);
+    let  device= Device::Cpu;
+    let x= Tensor::new(x_one_hot, &device)?.unsqueeze(0)?;
+    let y= Tensor::new(y_data, &device)?.unsqueeze(0)?;
+    println!("{}",x);
+    println!("{}",y);
     Ok(())
+}
+
+fn one_hot_encode(index: usize, vocab_size: usize) -> Vec<f64> {
+    let mut one_hot_row = vec![0.0; vocab_size];
+    one_hot_row[index] = 1.0;
+    one_hot_row
 }
