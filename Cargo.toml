@@ -13,3 +13,4 @@ polars = { version = "0.36.2", features = ["ndarray","to_dummies","lazy","descri
 tokio = { version = "1.36.0", features = ["full"] }
 anyhow = "1.0.80"
 ndarray = "0.15.6"
+rand = "0.8.5"
