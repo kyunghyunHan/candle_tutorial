@@ -1,7 +1,7 @@
 //로지스틱
 use candle_core::{DType, Device, Tensor, D};
 use candle_nn::{loss, ops, Linear, Module, Optimizer, VarBuilder, VarMap, SGD};
-use candle_datasets::{Batcher};
+
 use polars::datatypes::DataType;
 const LEARNING_RATE: f64 = 1.;
 const EPOCHS: usize = 1000;

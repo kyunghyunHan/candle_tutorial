@@ -1,7 +1,7 @@
 //다중
 use candle_core::{DType, Device, Tensor, D};
 use candle_nn::{loss, ops, Linear, Module, Optimizer, VarBuilder, VarMap, SGD};
-use candle_datasets::{Batcher};
+
 const LEARNING_RATE: f64 = 1e-5;
 const EPOCHS: usize = 2000;
 

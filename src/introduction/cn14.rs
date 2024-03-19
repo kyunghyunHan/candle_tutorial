@@ -145,7 +145,7 @@ fn training_loop(
 ) -> anyhow::Result<()> {
     const BSIZE: usize = 64;
 
-    let device = candle_core::Device::cuda_if_available(0)?;
+    let device = candle_core::Device::Cpu;
 
     // Train dataset
     let train_labels = dateset.train_labels;
@@ -235,7 +235,7 @@ pub async fn main() -> anyhow::Result<()> {
         epochs: 10,
         learning_rate: 0.001,
         load: None,
-        save: None,
+        save: Some("./test/model.safetensors".to_string()),
     };
     training_loop(m, &training_args)?;
     Ok(())
