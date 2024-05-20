@@ -1,4 +1,8 @@
-use candle_core::{safetensors::save, Device, Result, Tensor};
+use candle_core::{
+    safetensors::{self, save},
+    Device, Result, Tensor,
+};
+use std::collections::HashMap;
 
 pub fn main() -> Result<()> {
     c2()?;
@@ -43,8 +47,20 @@ pub fn c2() -> Result<()> {
     let model = Model { first, second };
 
     let dummy_image = Tensor::randn(0f32, 1.0, (1, 784), &device)?;
-    
+
     let digit = model.forward(&dummy_image)?;
-    println!("Digit {digit:?} digit");
+    let mut tensors_to_save: HashMap<String, Tensor> = HashMap::new();
+
+
+    let a = safetensors::load("my_embedding.safetensors", &device).unwrap();
+ 
+
+    let first = Linear {
+        weight: a.get("first.weight").unwrap().clone(),
+        bias: a.get("first.bias").unwrap().clone(),
+    };
+    for i in a{
+        println!("{}",i.1);
+    }
     Ok(())
 }
