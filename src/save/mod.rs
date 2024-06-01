@@ -55,10 +55,10 @@ pub fn c2() -> Result<()> {
     let a = safetensors::load("my_embedding.safetensors", &device).unwrap();
  
 
-    let first = Linear {
-        weight: a.get("first.weight").unwrap().clone(),
-        bias: a.get("first.bias").unwrap().clone(),
-    };
+    // let first = Linear {
+    //     weight: a.get("first.weight").unwrap().clone(),
+    //     bias: a.get("first.bias").unwrap().clone(),
+    // };
     for i in a{
         println!("{}",i.1);
     }
