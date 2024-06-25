@@ -7,10 +7,10 @@ edition = "2021"
 
 [dependencies]
 
-candle-core  = { version = "0.4.1", features = ["metal"] }
+candle-core  = { version = "0.5.1", features = ["metal"] }
 
-candle-nn = "0.4.1"
-polars = { version = "0.36.2", features = ["ndarray","to_dummies","lazy","describe","strings","list_count","describe","cov"] }
+candle-nn = "0.5.1"
+polars = { version = "0.41.2", features = ["lazy"] }
 tokio = { version = "1.36.0", features = ["full"] }
 anyhow = "1.0.80"
 ndarray = "0.15.6"

@@ -1,9 +1,11 @@
 mod tutorial;
 mod introduction;
+mod lstm;
+
+
 //test
 mod save;
 
 fn main() {
-    introduction::cn01::main().unwrap();
-    // save::main().unwrap();
+    lstm::main().unwrap();
 }
